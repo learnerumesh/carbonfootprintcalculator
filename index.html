@@ -369,7 +369,7 @@
             console.log(totalReduction);
 
 
-            totalReduction = totalReduction + (0.3*vehicleCarbon);
+            totalReduction = totalReduction + (0.5*vehicleCarbon);
             console.log(totalReduction);
 
             document.getElementById("total-footprint").innerText = totalEmission.toFixed(2);
@@ -379,7 +379,7 @@
             if (vehicleCarbon >0){
                 console.log("hello");
                 console.log(vehicleCarbon);
-                const lim = `<li class="list-group-item">${transportText} vs. Walking over short distance : Save ${vehicleCarbon-(0.3*vehicleCarbon).toFixed(2)} kg CO₂</li>`;
+                const lim = `<li class="list-group-item">${transportText} vs. Walking over short distance : Save ${vehicleCarbon-(0.5*vehicleCarbon).toFixed(2)} kg CO₂</li>`;
                 list.innerHTML +=lim;
             }
             selectedProducts.forEach(product => {
