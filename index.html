@@ -5,7 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kavya Carbon Calculator App</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        
+
+         /* Custom styling for the prompt overlay */
+    #namePrompt {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.75); /* Dark overlay background */
+      z-index: 1; /* Make sure the prompt appears on top of all other content */
+    }
+
+    .alert {
+      width: 50%; /* Adjust size of the alert box */
+    }
+
+    .alert-heading {
+      font-weight: bold;
+    }
+  .test{
+    display: none;
+  }
+  
+
         body {
             font-family: Arial, sans-serif;
             background-image: url('https://www.soletairpower.fi/wp-content/uploads/2022/02/daniel-moqvist-wzw6zs0kkzo-unsplash.jpg');
@@ -33,28 +62,60 @@
             margin-bottom: 20px;
         }
 
+        .icon-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .icon-box {
+            width: 80px;
+            height: 100px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .icon-box:hover {
+            transform: scale(1.1);
+            background-color: #388e3c;
+        }
+
+        .icon-box .tooltip {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 8px;
+            font-size: 12px;
+            border-radius: 5px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        
+
+        .icon-name {
+            font-size: 12px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
         .scrollable {
             max-height: 400px;
             overflow-y: auto;
             padding-right: 10px;
-        }
-
-        .product-box {
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 5px;
-            transition: all 0.3s;
-        }
-
-        .product-box:hover {
-            background-color: #388e3c;
-            transform: scale(1.05);
         }
 
         .btn-danger {
@@ -69,17 +130,54 @@
         .progress-bar {
             font-weight: bold;
         }
+
+        .wallet-icon {
+            font-size: 18px;
+            font-weight: bold;
+            color: #388e3c;
+            position: fixed;
+            top: 9%;
+            right: 20px;
+            background-color: #fff;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+
+        }
     </style>
+
 </head>
+
+
 <body>
+    <div id="namePrompt" class="d-flex align-items-center justify-content-center position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75">
+        <div class="alert alert-primary text-center w-50">
+          <h4 class="alert-heading">Welcome to Kavya Carbon Calculator App</h4>
+          <p>Please enter your name to continue.</p>
+          <div class="mb-3">
+            <input type="text" id="welcomeName" class="form-control" placeholder="Your Name">
+          </div>
+          <button class="btn btn-success" onclick="proceed()">Enter</button>
+        </div>
+  </div>
+
+
+<div class="test" id="test">
     <div class="container app-container">
         <h1>Kavya Carbon Calculator App</h1>
+        <div class="wallet-icon text-center">
+        <div style="color: orange;">Greetings!</div>
+    <div> <p id="name"></p></div>
+    </div>
         <div class="row">
             <!-- Left Section -->
             <div class="col-md-4">
                 <h5>Select Products</h5>
                 <div class="scrollable" id="product-list">
-                    <!-- Dynamically populated product list -->
+                    <div class="icon-grid">
+                        <!-- Dynamically populated icons will appear here -->
+                    </div>
                 </div>
             </div>
 
@@ -115,7 +213,7 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="resultModalLabel">Carbon Footprint Analysis</h5>
+                    <h5 class="modal-title" id="resultModalLabel">Carbon Footprint Analysis of (<p id="analysisName" style="display: inline;"></p>)</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -132,51 +230,50 @@
                     </div>
                     <div class="mt-3">
                         <h5>Impact Bar:</h5>
-                        <div class="progress">
+                        <div class="progress" style="height: 2rem;">
                             <div id="impact-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
-
+</div>
     <script>
+
         const products = [
-            { name: "Normal Toothbrush", emission: 5, alternative: "Bamboo Toothbrush", altEmission: 1 },
-            { name: "Paper Towel/Tissue Paper", emission: 20, alternative: "Cloth Towel/Handkerchief", altEmission: 2 },
-            { name: "Mineral Water Bottle", emission: 40, alternative: "Copper Water Bottle", altEmission: 5 },
-            { name: "Disposable Cup", emission: 10, alternative: "Reusable Cup", altEmission: 2 },
-            { name: "New Textile", emission: 50, alternative: "Recycled Fiber", altEmission: 10 },
-            { name: "Plastic Straw", emission: 3, alternative: "Metal Straw", altEmission: 0.5 },
-            { name: "Tea Bags", emission: 15, alternative: "Tea Grains", altEmission: 1 },
-            { name: "Packaged Food", emission: 100, alternative: "Whole Food", altEmission: 50 },
-            { name: "Smartphone Use", emission: 30, alternative: "Books", altEmission: 5 },
-            { name: "Disposable Mask", emission: 15, alternative: "Cloth Mask", altEmission: 2 },
-            { name: "Transportation (fossil fuel)", emission: 1000, alternative: "Electric Vehicle", altEmission: 500 },
-            { name: "Imported Items", emission: 300, alternative: "Local Items", altEmission: 150 },
-            { name: "Cooking Gas", emission: 300, alternative: "Electric Stove", altEmission: 100 },
-            { name: "Chemical Fertilizers", emission: 50, alternative: "Organic Fertilizers", altEmission: 10 },
-            { name: "Bubble Wrap", emission: 10, alternative: "Paper Wrap", altEmission: 2 },
-            { name: "Disposable Pen", emission: 5, alternative: "Refillable Pen", altEmission: 1 },
-            { name: "Leather", emission: 50, alternative: "Mushroom Leather", altEmission: 10 },
-            { name: "Carpet Floor Mat", emission: 25, alternative: "Gundri", altEmission: 5 },
-            { name: "Paper Calendar", emission: 10, alternative: "Digital Calendar", altEmission: 1 },
-            { name: "Plastic Bag", emission: 20, alternative: "Jute/Cloth Bag", altEmission: 2 },
-            { name: "Air Conditioner", emission: 500, alternative: "Fan", altEmission: 50 }
-        ];
+    { name: "Normal Toothbrush", emission: 1.5, alternative: "Bamboo Toothbrush", altEmission: 0.2, icon: "fa-tooth" },
+    { name: "Tissue Paper", emission: 2.6, alternative: "Handkerchief", altEmission: 0.3, icon: "fa-scroll" },
+    { name: "Mineral Water Bottle", emission: 10, alternative: "Copper Water Bottle", altEmission: 1, icon: "fa-water" },
+    { name: "Disposable Cup", emission: 3.2, alternative: "Reusable Cup", altEmission: 0.5, icon: "fa-mug-hot" },
+    { name: "Plastic Straw (1 used per day)", emission: 1.5, alternative: "Metal Straw", altEmission: 0.2, icon: "fa-straw" },
+    { name: "Tea Bags", emission: 0.4, alternative: "Tea Grains", altEmission: 0.1, icon: "fa-leaf" },
+    { name: "Packaged Instant Noodles", emission: 84, alternative: "Fruits (Orange)", altEmission: 21, icon: "fa-box-open" },
+    { name: "Disposable Mask", emission: 52, alternative: "Cloth Mask", altEmission: 5.5, icon: "fa-mask" },
+    { name: "Chemical Fertilizers", emission: 25, alternative: "Organic Fertilizers", altEmission: 10, icon: "fa-seedling" },
+    { name: "Bubble Wrap", emission: 3, alternative: "Paper Wrap", altEmission: 0.8, icon: "fa-box" },
+    { name: "Disposable Pen", emission: 0.5, alternative: "Refillable Pen", altEmission: 0.2, icon: "fa-pen" },
+    { name: "Sitting Mat", emission: 5, alternative: "Straw Chakati", altEmission: 1, icon: "fa-chair" },
+    { name: "Paper Calendar", emission: 0.5, alternative: "Digital Calendar", altEmission: 0.05, icon: "fa-calendar" },
+    { name: "Plastic Bag", emission: 1, alternative: "Jute/Cloth Bag", altEmission: 0.2, icon: "fa-shopping-bag" }
+];
+
 
         const selectedProducts = [];
 
         function loadProducts() {
-            const productList = document.getElementById("product-list");
+            const productList = document.querySelector(".icon-grid");
             products.forEach(product => {
                 const div = document.createElement("div");
-                div.className = "product-box";
-                div.innerHTML = `${product.name}<br><small>${product.emission} kg CO₂</small>`;
+                div.className = "icon-box";
+                div.innerHTML = `
+                    <i class="fas ${product.icon}" style="font-size: 24px;"></i>
+                    <span class="icon-name">${product.name}</span>
+                    <div class="tooltip">${product.name}</div>
+                `;
                 div.onclick = () => selectProduct(product);
                 productList.appendChild(div);
             });
@@ -219,11 +316,11 @@
         }
 
         function showModal() {
+            document.getElementById('analysisName').innerText = name;
             const totalEmission = selectedProducts.reduce((sum, p) => sum + p.emission * p.quantity, 0);
             const totalReduction = selectedProducts.reduce((sum, p) => sum + (p.emission - p.altEmission) * p.quantity, 0);
-
             document.getElementById("total-footprint").innerText = totalEmission.toFixed(2);
-
+            console.log(totalEmission)
             const list = document.getElementById("comparison-list");
             list.innerHTML = "";
             selectedProducts.forEach(product => {
@@ -237,17 +334,49 @@
                 "Keep trying to reduce your carbon footprint further!";
             document.getElementById("environmental-impact").innerText = contributionMessage;
 
-            const impactPercentage = Math.min(100, (totalReduction / (totalReduction + totalEmission)) * 100).toFixed(0);
+            // const impactPercentage = Math.min(100, (totalReduction / (totalReduction + totalEmission)) * 100).toFixed(0);
+            const impactPercentage = (totalReduction/totalEmission*100).toFixed(0);
             const impactBar = document.getElementById("impact-bar");
             impactBar.style.width = `${impactPercentage}%`;
-            impactBar.innerText = `${impactPercentage}% Reduction`;
+            impactBar.innerText = `${impactPercentage}% Reduction (${(totalReduction).toFixed(0)} Kgs)`;
 
             const modal = new bootstrap.Modal(document.getElementById("resultModal"));
             modal.show();
         }
 
         window.onload = loadProducts;
+        //proceed function
+        let name;
+function proceed() {
+      // Get the name entered by the user
+      name = document.getElementById('welcomeName').value;
+
+      // If a name is entered, proceed
+      if (name) {
+        // Set the entered name to the username span
+        // document.getElementById('username').innerText = name;
+
+        // Hide the prompt and show the content
+        
+        document.getElementById('test').style.display = 'block';
+        document.getElementById('namePrompt').style.visibility = 'hidden';
+
+        document.getElementById('namePrompt').style.display = 'none';
+        document.getElementById('name').innerText = name;
+      } else {
+        // Alert if no name is entered
+        alert("Please enter your name to proceed.");
+      }
+    }
+// Optional: Close the prompt if the user presses "Enter" (for better user experience)
+    document.getElementById('welcomeName').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        proceed(); // Call proceed if Enter is pressed
+      }
+    });
+
     </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
