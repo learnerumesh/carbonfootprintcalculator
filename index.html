@@ -33,6 +33,21 @@
   .test{
     display: none;
   }
+  .vehicleDiv{
+    display: none;
+  }
+  #vehiclePrompt {
+        display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.75); /* Dark overlay background */
+      z-index: 1; /* Make sure the prompt appears on top of all other content */
+  }
   
 
         body {
@@ -162,6 +177,27 @@
         </div>
   </div>
 
+  <!-- second prompt -->
+  <div class="vehicleDiv" id="vehicleDiv">
+  <div id="vehiclePrompt" class="d-flex align-items-center justify-content-center position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75">
+    <div class="alert alert-primary text-center w-50">
+        <h4 class="alert-heading">Hello, <p id="startName"></p></h4>
+        <p>Please select your mode of transport</p>
+        <div class="mb-3">
+            <!-- <input type="text"  class="form-control mb-3" placeholder="Your transportation mode"> -->
+            <select id="transportMode" class="form-select">
+                <option value="100">Public Bus (100 g CO2/km)</option>
+                <option value="35">Electric Bus (35 g CO2/km)</option>
+                <option value="200">Private Petrol Car (200 g CO2/km)</option>
+                <option value="80">Private Motorbike (80 g CO2/km)</option>
+            </select>
+        </div>
+        <button class="btn btn-success" onclick="proceed1()">Enter</button>
+    </div>
+</div>
+</div>
+  <!--  -->
+
 
 <div class="test" id="test">
     <div class="container app-container">
@@ -220,7 +256,9 @@
                     <h4>Total Carbon Footprint: <span id="total-footprint" class="text-danger">0.00</span> kg CO₂</h4>
                     <div class="mt-3">
                         <h5>Reduction Opportunities:</h5>
+                        <p>Hello world</p>
                         <ul id="comparison-list" class="list-group">
+
                             <!-- Dynamically added comparisons will appear here -->
                         </ul>
                     </div>
@@ -261,7 +299,7 @@
     { name: "Plastic Bag", emission: 1, alternative: "Jute/Cloth Bag", altEmission: 0.2, icon: "fa-shopping-bag" }
 ];
 
-
+        let carbonFootprint=0;//proceed1 function vanda aagadi bata yo value aauxa
         const selectedProducts = [];
 
         function loadProducts() {
@@ -338,7 +376,7 @@
             const impactPercentage = (totalReduction/totalEmission*100).toFixed(0);
             const impactBar = document.getElementById("impact-bar");
             impactBar.style.width = `${impactPercentage}%`;
-            impactBar.innerText = `${impactPercentage}% Reduction (${(totalReduction).toFixed(0)} Kgs)`;
+            impactBar.innerText = `${impactPercentage}% Reduction (${(totalReduction).toFixed(1)} Kgs)`;
 
             const modal = new bootstrap.Modal(document.getElementById("resultModal"));
             modal.show();
@@ -358,11 +396,11 @@ function proceed() {
 
         // Hide the prompt and show the content
         
-        document.getElementById('test').style.display = 'block';
+        document.getElementById('vehicleDiv').style.display = 'block';
         document.getElementById('namePrompt').style.visibility = 'hidden';
 
         document.getElementById('namePrompt').style.display = 'none';
-        document.getElementById('name').innerText = name;
+        document.getElementById('startName').innerText = name;
       } else {
         // Alert if no name is entered
         alert("Please enter your name to proceed.");
@@ -374,6 +412,36 @@ function proceed() {
         proceed(); // Call proceed if Enter is pressed
       }
     });
+
+
+//this function will run after selecting vehicle option
+    function proceed1(){
+        const transportMode = document.getElementById('transportMode');
+        carbonFootprint = transportMode.value; // Carbon emission value
+        const transportText = transportMode.options[transportMode.selectedIndex].text; // Selected option text
+
+        if (transportText){
+            document.getElementById('test').style.display = 'block';
+            document.getElementById('vehicleDiv').style.visibility = 'hidden';
+
+            document.getElementById('vehicleDiv').style.display = 'none';
+            document.getElementById('name').innerText = name;
+        } 
+        else {
+            // Alert if no vehicle  is entered
+            alert("Please select one transportation mode");
+        }
+
+    }
+
+    const selectElement = document.getElementById('transportMode');
+
+    selectElement.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        proceed1(); // Call proceed if Enter is pressed
+      }
+    });
+
 
     </script>
 
