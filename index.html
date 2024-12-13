@@ -186,11 +186,15 @@
         <div class="mb-3">
             <!-- <input type="text"  class="form-control mb-3" placeholder="Your transportation mode"> -->
             <select id="transportMode" class="form-select">
-                <option value="100">Public Bus (100 g CO2/km)</option>
-                <option value="35">Electric Bus (35 g CO2/km)</option>
-                <option value="200">Private Petrol Car (200 g CO2/km)</option>
-                <option value="80">Private Motorbike (80 g CO2/km)</option>
+                <option value="100">Public Bus</option>
+                <option value="35">Electric Bus</option>
+                <option value="200">Private Petrol Car</option>
+                <option value="80">Private Motorbike</option>
             </select>
+
+        </div>
+        <div class="mb-3">
+            <input style="display:inline;" type="number"  class="form-control mb-3" id="travelDistance" placeholder="Your Daily Travel Distance">
         </div>
         <button class="btn btn-success" onclick="proceed1()">Enter</button>
     </div>
@@ -259,6 +263,7 @@
                         <p>Hello world</p>
                         <ul id="comparison-list" class="list-group">
 
+
                             <!-- Dynamically added comparisons will appear here -->
                         </ul>
                     </div>
@@ -299,7 +304,7 @@
     { name: "Plastic Bag", emission: 1, alternative: "Jute/Cloth Bag", altEmission: 0.2, icon: "fa-shopping-bag" }
 ];
 
-        let carbonFootprint=0;//proceed1 function vanda aagadi bata yo value aauxa
+        
         const selectedProducts = [];
 
         function loadProducts() {
@@ -355,17 +360,37 @@
 
         function showModal() {
             document.getElementById('analysisName').innerText = name;
-            const totalEmission = selectedProducts.reduce((sum, p) => sum + p.emission * p.quantity, 0);
-            const totalReduction = selectedProducts.reduce((sum, p) => sum + (p.emission - p.altEmission) * p.quantity, 0);
+            let totalEmission = selectedProducts.reduce((sum, p) => sum + p.emission * p.quantity, 0);
+            totalEmission = totalEmission + vehicleCarbon;
+            let totalReduction = selectedProducts.reduce((sum, p) => sum + (p.emission - p.altEmission) * p.quantity, 0);
+
+
+            console.log("here is total emission and reduction");
+            console.log(totalEmission);
+            console.log(totalReduction);
+
+
+            totalReduction = totalReduction + (0.3*vehicleCarbon);
+            console.log(totalReduction);
+
             document.getElementById("total-footprint").innerText = totalEmission.toFixed(2);
             console.log(totalEmission)
             const list = document.getElementById("comparison-list");
             list.innerHTML = "";
+            if (vehicleCarbon >0){
+                console.log("hello");
+                console.log(vehicleCarbon);
+                const lim = `<li class="list-group-item">${transportText} vs. Walking over short distance : Save ${vehicleCarbon-(0.3*vehicleCarbon).toFixed(2)} kg CO₂</li>`;
+                list.innerHTML +=lim;
+            }
             selectedProducts.forEach(product => {
                 const reduction = (product.emission - product.altEmission) * product.quantity;
+
                 const li = `<li class="list-group-item">${product.name} vs. ${product.alternative}: Save ${reduction.toFixed(2)} kg CO₂</li>`;
                 list.innerHTML += li;
             });
+            
+
 
             const contributionMessage = totalReduction >= 200 ? 
                 "You are saving an equivalent of 5 trees or 10 birds!" : 
@@ -415,10 +440,18 @@ function proceed() {
 
 
 //this function will run after selecting vehicle option
+    let vehicleCarbon=0;
+    let transportText;
     function proceed1(){
         const transportMode = document.getElementById('transportMode');
-        carbonFootprint = transportMode.value; // Carbon emission value
-        const transportText = transportMode.options[transportMode.selectedIndex].text; // Selected option text
+        let carbonFootprint = transportMode.value; // Carbon emission value
+        transportText = transportMode.options[transportMode.selectedIndex].text; // Selected option text
+        const travelDistance = document.getElementById('travelDistance').value;
+        vehicleCarbon = travelDistance*(carbonFootprint/100)*365;
+        console.log(vehicleCarbon);
+        if (carbonFootprint>=19){
+
+        }
 
         if (transportText){
             document.getElementById('test').style.display = 'block';
@@ -434,9 +467,7 @@ function proceed() {
 
     }
 
-    const selectElement = document.getElementById('transportMode');
-
-    selectElement.addEventListener('keydown', function(event) {
+    document.getElementById('travelDistance').addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         proceed1(); // Call proceed if Enter is pressed
       }
