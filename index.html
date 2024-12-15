@@ -6,8 +6,13 @@
     <title>Kavya Carbon Calculator App</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+
+
+
+
     <style>
-        
+
 
          /* Custom styling for the prompt overlay */
     #namePrompt {
@@ -160,6 +165,10 @@
             z-index: 9999;
 
         }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
     </style>
 
 </head>
@@ -250,48 +259,58 @@
 
     <!-- Results Modal -->
     <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="resultModalLabel">Carbon Footprint Analysis of (<p id="analysisName" style="display: inline;"></p>)</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resultModalLabel">Carbon Footprint Analysis of <span id="analysisName" style="display: inline;"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Total Carbon Footprint -->
+                <div class="p-3 mb-4 border rounded bg-warning shadow-sm">
+                    <h4>Total Carbon Footprint: <span id="total-footprint" class="text-danger" style="font-weight: 28px; font-weight: bold;">0.00</span> kg CO₂ / Year</h4>
                 </div>
-                <div class="modal-body">
-                    <h4>Total Carbon Footprint: <span id="total-footprint" class="text-danger">0.00</span> kg CO₂</h4>
-                    <div class="mt-3">
-                        <h5>Reduction Opportunities:</h5>
-                        <ul id="comparison-list" class="list-group">
 
+                <!-- Reduction Opportunities -->
+                <div class="p-4 mb-4 border rounded bg-light shadow-sm">
+                    <h5 class="text-primary">Reduction Opportunities:</h5>
+                    <ul id="comparison-list" class="list-group">
+                        <!-- Dynamically added comparisons will appear here -->
+                    </ul>
+                </div>
 
-                            <!-- Dynamically added comparisons will appear here -->
-                        </ul>
-                    </div>
-                    <div class="mt-3">
-                        <h5>Your Contribution to Nature:</h5>
-                        <p id="environmental-impact" class="text-success"></p>
-                    </div>
-                    <div class="mt-3">
-                        <h5>Impact Bar:</h5>
-                        <div class="progress" style="height: 2rem;">
-                            <div id="impact-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
-                        </div>
-                    </div>
+                <!-- Your Contribution to Nature -->
+                <div class="p-4 mb-4 border rounded text-black shadow-sm" style="background: RGB(197, 250, 192);">
+                    <h4>Your Contribution to Nature:</h4>
+                    <p id="environmental-impact" class="fw-bold"></p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
+
+                <!-- Impact Bar -->
+                <div class="p-4 border rounded text-black shadow-sm">
+                    <h5>Reduction Bar:</h5>
+                    <div class="progress" style="height: 2rem;">
+                        <div id="impact-bar" class="progress-bar bg-warning" role="progressbar" style="width: 0%;"></div>
+                    </div>
+                   <div id="reductionText"></div>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="printModal()">Print</button>
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
+
+</div>
     <script>
 
         const products = [
-    { name: "Normal Toothbrush", emission: 1.5, alternative: "Bamboo Toothbrush", altEmission: 0.2, icon: "fa-tooth" },
+    { name: "Normal Toothbrush", emission: 1.5, alternative: "Bamboo Toothbrush", altEmission: 0.2, icon: "fa-brush" },
     { name: "Tissue Paper", emission: 2.6, alternative: "Handkerchief", altEmission: 0.3, icon: "fa-scroll" },
     { name: "Mineral Water Bottle", emission: 10, alternative: "Copper Water Bottle", altEmission: 1, icon: "fa-water" },
     { name: "Disposable Cup", emission: 3.2, alternative: "Reusable Cup", altEmission: 0.5, icon: "fa-mug-hot" },
-    { name: "Plastic Straw (1 used per day)", emission: 1.5, alternative: "Metal Straw", altEmission: 0.2, icon: "fa-straw" },
+    { name: "Plastic Straw (1 used per day)", emission: 1.5, alternative: "Metal Straw", altEmission: 0.2, icon: "icon-cup" },
     { name: "Tea Bags", emission: 0.4, alternative: "Tea Grains", altEmission: 0.1, icon: "fa-leaf" },
     { name: "Packaged Instant Noodles", emission: 84, alternative: "Fruits (Orange)", altEmission: 21, icon: "fa-box-open" },
     { name: "Disposable Mask", emission: 52, alternative: "Cloth Mask", altEmission: 5.5, icon: "fa-mask" },
@@ -364,12 +383,11 @@
             let totalReduction = selectedProducts.reduce((sum, p) => sum + (p.emission - p.altEmission) * p.quantity, 0);
 
 
-            console.log("here is total emission and reduction");
-            console.log(totalEmission);
-            console.log(totalReduction);
-
 
             totalReduction = totalReduction + (0.5*vehicleCarbon);
+            
+            const msg= `<p  style="font-weight:bold">You will reduce ${totalReduction.toFixed(1)} Kgs of carbon footprint per year</p>`;
+            document.getElementById("reductionText").innerHTML=msg;
             console.log(totalReduction);
 
             document.getElementById("total-footprint").innerText = totalEmission.toFixed(2);
@@ -377,15 +395,28 @@
             const list = document.getElementById("comparison-list");
             list.innerHTML = "";
             if (vehicleCarbon >0){
-                console.log("hello");
-                console.log(vehicleCarbon);
-                const lim = `<li class="list-group-item">${transportText} vs. Walking over short distance : Save ${(vehicleCarbon-(0.5*vehicleCarbon)).toFixed(2)} kg CO₂</li>`;
+                const lim = 
+                            `<li class="list-group-item">
+                                <p style="font-weight:bold;color:red; display:inline;">${transportText}</p>
+                                <span style="display:inline;"> vs. </span>
+                                <p style="font-weight:bold;color:green; display:inline;">Walking over short distance:</p>
+                                <span style="display:inline; font-weight:bold;"> Save ${(vehicleCarbon - (0.5 * vehicleCarbon)).toFixed(2)} Kg CO₂ / Year</span>
+                            </li>`;
+
                 list.innerHTML +=lim;
             }
             selectedProducts.forEach(product => {
                 const reduction = (product.emission - product.altEmission) * product.quantity;
 
-                const li = `<li class="list-group-item">${product.name} vs. ${product.alternative}: Save ${reduction.toFixed(2)} kg CO₂</li>`;
+                // const li = `<li class="list-group-item">${product.name} vs. ${product.alternative}: Save ${reduction.toFixed(2)} kg CO₂</li>`;
+                const li = `
+                    <li class="list-group-item">
+                        <span style="color:red; font-weight:bold;">${product.name}</span> 
+                        <span style="font-style:italic;">vs.</span> 
+                        <span style="color:green; font-weight:bold;">${product.alternative}</span>: 
+                        <span style="font-weight:bold;">Save ${reduction.toFixed(2)} kg CO₂ / Year</span>
+                    </li>`;
+
                 list.innerHTML += li;
             });
             
@@ -446,7 +477,7 @@ function proceed() {
         let carbonFootprint = transportMode.value; // Carbon emission value
         transportText = transportMode.options[transportMode.selectedIndex].text; // Selected option text
         const travelDistance = document.getElementById('travelDistance').value;
-        vehicleCarbon = travelDistance*(carbonFootprint/100)*365;
+        vehicleCarbon = travelDistance*(carbonFootprint/1000)*365;
         console.log(vehicleCarbon);
         if (carbonFootprint>=19){
 
@@ -472,7 +503,50 @@ function proceed() {
       }
     });
 
+//to print
+     function printModal() {
+            // Get the modal content
+            const modalContent = document.querySelector('#resultModal .modal-content').innerHTML;
 
+            // Open a new window for printing
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+
+            // Write the modal content into the new window
+            printWindow.document.open();
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Print Modal</title>
+                        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+                        <style>
+                            /* Apply styles for print */
+                            body { margin: 20px; font-family: Arial, sans-serif; }
+                            .progress {
+                                border: 1px solid #000;
+                                height: 2rem;
+                                margin-top: 10px;
+                            }
+                            .progress-bar {
+                                background-color: #28a745 !important;
+                                color: white;
+                                text-align: center;
+                                line-height: 2rem;
+                            }
+                            .no-print {
+                                display: none !important;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${modalContent}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+
+            // Trigger the print dialog
+            printWindow.print();
+        }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
