@@ -348,12 +348,8 @@
                     </ul>
                 </div>
 
-                <!-- Your Contribution to Nature -->
-                <div class="p-4 mb-4 border rounded text-black shadow-sm" style="background: RGB(197, 250, 192);">
-                    <h4>Your Contribution to Nature:</h4>
-                    <p id="environmental-impact" class="fw-bold"></p>
-                </div>
                 
+
                 <!-- Impact Bar -->
                 <div class="p-4 border rounded text-black shadow-sm">
                     <h5>Reduction Bar:</h5>
@@ -361,6 +357,11 @@
                         <div id="impact-bar" class="progress-bar bg-warning" role="progressbar" style="width: 0%;"></div>
                     </div>
                    <div id="reductionText"></div>
+                </div>
+                <!-- Your Contribution to Nature -->
+                <div class="p-4 mt-4 border rounded text-black shadow-sm" style="background: RGB(197, 250, 192);">
+                    <h4>Your Contribution to Nature:</h4>
+                    <p id="environmental-impact" class="fw-bold"></p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -502,15 +503,15 @@
 
 
             const contributionMessage = totalReduction >= 1500 ? 
-                "Incredible! Your reduction is saving the equivalent of 40 trees and 150 birds each year!" : 
+                "Your reduction is saving the equivalent of 40 trees and 150 birds each year!" : 
                 totalReduction >= 1000 ? 
-                    "Great work! You're saving the equivalent of 30 trees and 100 birds annually!" : 
+                    "You're saving the equivalent of 30 trees and 100 birds annually!" : 
                 totalReduction >= 500 ? 
-                    "Well done! You're helping the environment by saving 15 trees and 50 birds each year!" : 
+                    "You're helping the environment by saving 15 trees and 50 birds each year!" : 
                 totalReduction >= 250 ? 
-                    "Nice progress! Your reduction is like saving 7 trees and 20 birds annually!" : 
+                    "Your reduction is like saving 7 trees and 20 birds annually!" : 
                 totalReduction >= 100 ? 
-                    "Good job! You're saving the equivalent of 3 trees and 10 birds each year!" : 
+                    "You're saving the equivalent of 3 trees and 10 birds each year!" : 
                 "Every bit helps! Keep reducing your carbon footprint and protect wildlife!";
 
 
