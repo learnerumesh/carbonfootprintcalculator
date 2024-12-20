@@ -42,6 +42,22 @@
     display: none;
   }
   #vehiclePrompt {
+    display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.75); /* Dark overlay background */
+      z-index: 2; /* Make sure the prompt appears on top of all other content */
+  }
+
+  .flightDiv{
+    display: none;
+  }
+  #flightPrompt {
         display: flex;
       align-items: center;
       justify-content: center;
@@ -51,7 +67,22 @@
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.75); /* Dark overlay background */
-      z-index: 1; /* Make sure the prompt appears on top of all other content */
+      z-index: 3; /* Make sure the prompt appears on top of all other content */
+  }
+  .interDiv{
+    display: none;
+  }
+  #interPrompt {
+        display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.75); /* Dark overlay background */
+      z-index: 4; /* Make sure the prompt appears on top of all other content */
   }
   
 
@@ -182,7 +213,7 @@
           <div class="mb-3">
             <input type="text" id="welcomeName" class="form-control" placeholder="Your Name">
           </div>
-          <button class="btn btn-success" onclick="proceed()">Enter</button>
+          <button class="btn btn-success" onclick="proceed()">Next</button>
         </div>
   </div>
 
@@ -205,20 +236,58 @@
         <div class="mb-3">
             <input style="display:inline;" type="number"  class="form-control mb-3" id="travelDistance" placeholder="Your Daily Travel Distance">
         </div>
-        <button class="btn btn-success" onclick="proceed1()">Enter</button>
+        <button class="btn btn-success" onclick="proceed1()">Next</button>
+    </div>
+</div>
+</div>
+
+<!-- third prompt -->
+<div class="flightDiv" id="flightDiv">
+  <div id="flightPrompt" class="d-flex align-items-center justify-content-center position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75">
+    <div class="alert alert-primary text-center w-50">
+        <h4 class="alert-heading">How much do you travel via domestic flight in a year?</h4>
+        <div class="mb-3">
+            <select id="flightMode" class="form-select">
+                <option value="20">Domestic Flight</option>
+            </select>
+
+        </div>
+        <div class="mb-3">
+            <input style="display:inline;" type="number"  class="form-control mb-3" id="flightDistance" placeholder="Number of flights per year">
+        </div>
+        <button class="btn btn-success" onclick="proceed2()">Next</button>
     </div>
 </div>
 </div>
   <!--  -->
 
+<!-- fourth prompt -->
+<div class="interDiv" id="interDiv">
+  <div id="interPrompt" class="d-flex align-items-center justify-content-center position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75">
+    <div class="alert alert-primary text-center w-50">
+        <h4 class="alert-heading">How much do you travel via international flight in a year?</h4>
+        <div class="mb-3">
+            <select id="interMode" class="form-select">
+                <option value="300">International Flight</option>
+            </select>
+
+        </div>
+        <div class="mb-3">
+            <input style="display:inline;" type="number"  class="form-control mb-3" id="interDistance" placeholder="Number of flights per year">
+        </div>
+        <button class="btn btn-success" onclick="proceed3()">Enter</button>
+    </div>
+</div>
+</div>
+  <!--  -->
 
 <div class="test" id="test">
     <div class="container app-container">
         <h1>Kavya Carbon Calculator App</h1>
         <div class="wallet-icon text-center">
-        <div style="color: orange;">Greetings!</div>
-    <div> <p id="name"></p></div>
-    </div>
+            <div style="color: orange;">Greetings!</div>
+            <div> <p id="name"></p></div>
+        </div>
         <div class="row">
             <!-- Left Section -->
             <div class="col-md-4">
@@ -284,7 +353,7 @@
                     <h4>Your Contribution to Nature:</h4>
                     <p id="environmental-impact" class="fw-bold"></p>
                 </div>
-
+                
                 <!-- Impact Bar -->
                 <div class="p-4 border rounded text-black shadow-sm">
                     <h5>Reduction Bar:</h5>
@@ -379,12 +448,12 @@
         function showModal() {
             document.getElementById('analysisName').innerText = name;
             let totalEmission = selectedProducts.reduce((sum, p) => sum + p.emission * p.quantity, 0);
-            totalEmission = totalEmission + vehicleCarbon;
+            totalEmission = totalEmission + vehicleCarbon + flightCarbon + interCarbon;
             let totalReduction = selectedProducts.reduce((sum, p) => sum + (p.emission - p.altEmission) * p.quantity, 0);
 
 
 
-            totalReduction = totalReduction + (0.5*vehicleCarbon);
+            totalReduction = totalReduction + (0.5*vehicleCarbon) + (0.6*flightCarbon);
             
             const msg= `<p  style="font-weight:bold">You will reduce ${totalReduction.toFixed(1)} Kgs of carbon footprint per year</p>`;
             document.getElementById("reductionText").innerHTML=msg;
@@ -404,6 +473,16 @@
                             </li>`;
 
                 list.innerHTML +=lim;
+                const lim1 = 
+                            `<li class="list-group-item">
+                                <p style="font-weight:bold;color:red; display:inline;">${flightText}</p>
+                                <span style="display:inline;"> vs. </span>
+                                <p style="font-weight:bold;color:green; display:inline;">Using road vehicles</p>
+                                <span style="display:inline; font-weight:bold;"> Save ${(flightCarbon - (0.6 * flightCarbon)).toFixed(2)} Kg CO₂ / Year</span>
+                            </li>`;
+
+                list.innerHTML +=lim1;
+               
             }
             selectedProducts.forEach(product => {
                 const reduction = (product.emission - product.altEmission) * product.quantity;
@@ -422,9 +501,19 @@
             
 
 
-            const contributionMessage = totalReduction >= 200 ? 
-                "You are saving an equivalent of 5 trees or 10 birds!" : 
-                "Keep trying to reduce your carbon footprint further!";
+            const contributionMessage = totalReduction >= 1500 ? 
+                "Incredible! Your reduction is saving the equivalent of 40 trees and 150 birds each year!" : 
+                totalReduction >= 1000 ? 
+                    "Great work! You're saving the equivalent of 30 trees and 100 birds annually!" : 
+                totalReduction >= 500 ? 
+                    "Well done! You're helping the environment by saving 15 trees and 50 birds each year!" : 
+                totalReduction >= 250 ? 
+                    "Nice progress! Your reduction is like saving 7 trees and 20 birds annually!" : 
+                totalReduction >= 100 ? 
+                    "Good job! You're saving the equivalent of 3 trees and 10 birds each year!" : 
+                "Every bit helps! Keep reducing your carbon footprint and protect wildlife!";
+
+
             document.getElementById("environmental-impact").innerText = contributionMessage;
 
             // const impactPercentage = Math.min(100, (totalReduction / (totalReduction + totalEmission)) * 100).toFixed(0);
@@ -444,18 +533,14 @@ function proceed() {
       // Get the name entered by the user
       name = document.getElementById('welcomeName').value;
 
-      // If a name is entered, proceed
       if (name) {
-        // Set the entered name to the username span
-        // document.getElementById('username').innerText = name;
-
-        // Hide the prompt and show the content
         
         document.getElementById('vehicleDiv').style.display = 'block';
         document.getElementById('namePrompt').style.visibility = 'hidden';
 
         document.getElementById('namePrompt').style.display = 'none';
         document.getElementById('startName').innerText = name;
+        document.getElementById('name').innerText=name;
       } else {
         // Alert if no name is entered
         alert("Please enter your name to proceed.");
@@ -472,23 +557,29 @@ function proceed() {
 //this function will run after selecting vehicle option
     let vehicleCarbon=0;
     let transportText;
-    function proceed1(){
+    let flightText,interText;
+    let flightCarbon=0;
+    let interCarbon = 0;
+
+
+function proceed1(){
+
         const transportMode = document.getElementById('transportMode');
         let carbonFootprint = transportMode.value; // Carbon emission value
         transportText = transportMode.options[transportMode.selectedIndex].text; // Selected option text
         const travelDistance = document.getElementById('travelDistance').value;
         vehicleCarbon = travelDistance*(carbonFootprint/1000)*365;
-        console.log(vehicleCarbon);
-        if (carbonFootprint>=19){
-
-        }
+        
 
         if (transportText){
-            document.getElementById('test').style.display = 'block';
+            document.getElementById('flightDiv').style.display = 'block';
             document.getElementById('vehicleDiv').style.visibility = 'hidden';
+            document.getElementById('namePrompt').style.visibility = 'hidden';
 
             document.getElementById('vehicleDiv').style.display = 'none';
-            document.getElementById('name').innerText = name;
+            document.getElementById('test').style.display = 'none';
+            document.getElementById('startName').innerText = name;
+            // document.getElementById('startName').innerText = name;
         } 
         else {
             // Alert if no vehicle  is entered
@@ -496,10 +587,74 @@ function proceed() {
         }
 
     }
-
     document.getElementById('travelDistance').addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
         proceed1(); // Call proceed if Enter is pressed
+      }
+    });
+
+// this is for domestic flight
+    function proceed2(){
+
+        const transportMode = document.getElementById('flightMode');
+        let carbonFootprint = transportMode.value; // Carbon emission value
+        flightText = transportMode.options[transportMode.selectedIndex].text; // Selected option text
+        const travelDistance = document.getElementById('flightDistance').value;
+        flightCarbon = travelDistance*20;
+        
+
+        if (flightText){
+            document.getElementById('interDiv').style.display = 'block';
+            document.getElementById('flightDiv').style.display = 'none';
+            document.getElementById('flightDiv').style.visibility = 'hidden';
+            document.getElementById('startNam').innerText = name;
+            
+            // document.getElementById('test').style.visibility = 'display';
+            
+        } 
+        else {
+            // Alert if no vehicle  is entered
+            alert("Please enter the value!");
+        }
+
+    }
+
+    document.getElementById('flightDistance').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        proceed2(); // Call proceed if Enter is pressed
+      }
+    });
+
+// this is for International flight
+    function proceed3(){
+        name = document.getElementById('welcomeName').value;
+
+        const transportMode = document.getElementById('interMode');
+        let carbonFootprint = transportMode.value; // Carbon emission value
+        interText = transportMode.options[transportMode.selectedIndex].text; // Selected option text
+        const travelDistance = document.getElementById('interDistance').value;
+        interCarbon = travelDistance*300;
+        
+
+        if (interText){
+            document.getElementById('test').style.display = 'block';
+            document.getElementById('interDiv').style.display = 'none';
+            document.getElementById('interDiv').style.visibility = 'hidden';
+            // document.getElementById('name').innerText = name;
+            
+            // document.getElementById('test').style.visibility = 'display';
+            
+        } 
+        else {
+            // Alert if no vehicle  is entered
+            alert("Please enter the value!");
+        }
+
+    }
+
+    document.getElementById('interDistance').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        proceed3(); // Call proceed if Enter is pressed
       }
     });
 
